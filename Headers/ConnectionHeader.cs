@@ -132,6 +132,11 @@ namespace HttpServer.Headers
         /// <summary>
         /// Connection is kept alive for X seconds (unless another request have been made)
         /// </summary>
-        KeepAlive
+        KeepAlive,
+
+        /// <summary>
+        /// Requests message-body be sent with an encoding to be specified in the "Transfer-Encoding" header.
+        /// </summary>
+        TransferEncoding
     }
 }

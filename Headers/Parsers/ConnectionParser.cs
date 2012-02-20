@@ -20,20 +20,19 @@ namespace HttpServer.Headers.Parsers
         /// <exception cref="FormatException">Header value is not of the expected format.</exception>
         public IHeader Parse(string name, ITextReader reader)
         {
-            string typeStr = reader.ReadToEnd(",;");
+            string value = reader.ReadToEnd(",;");
             if (reader.Current == ',') // to get rid of the TE header.
                 reader.ReadToEnd(';');
 
             ConnectionType type;
-
-            try
-            {
-                type = (ConnectionType) Enum.Parse(typeof (ConnectionType), typeStr.Replace("-", string.Empty), true);
-            }
-            catch (ArgumentException err)
-            {
-                throw new FormatException("Unknown connection type '" + typeStr + "'.", err);
-            }
+            if (string.Compare(value, "close", true) == 0)
+                type = ConnectionType.Close;
+            else if (value.StartsWith("keep-alive", StringComparison.CurrentCultureIgnoreCase))
+                type = ConnectionType.KeepAlive;
+            else if (value.StartsWith("te", StringComparison.CurrentCultureIgnoreCase))
+                type = ConnectionType.TransferEncoding;
+            else
+                throw new FormatException("Unknown connection type '" + value + "'.");
 
             // got parameters
             if (reader.Current == ';')
